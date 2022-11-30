@@ -1,7 +1,8 @@
 package main
 
 import (
-	calculator "avarpuk_calc/calc"
+	"avarpuk_calc/calc"
+	"avarpuk_calc/parser"
 	"bufio"
 	"fmt"
 	"os"
@@ -12,14 +13,20 @@ import (
 const colorClear = "\033[H\033[2J"
 
 func main() {
-	calculator := calculator.NewDefaultCalculator()
+	fmt.Print(colorClear)
+
+	parsers := []parser.Parsers{
+		&parser.ArabicParser{},
+		&parser.RomanParser{},
+	}
+
+	calculators := calculator.NewDefaultCalculator()
 
 	for {
 		var (
-			inputString string
+			inputString, operation string
+			num1, num2             float64
 		)
-
-		fmt.Print(colorClear)
 
 		scanner := bufio.NewScanner(os.Stdin)
 
@@ -33,10 +40,14 @@ func main() {
 		case "break":
 			return
 		default:
-
+			for i := 0; i < len(parsers); i++ {
+				if err := parsers[i].Parse(inputString, &num1, &operation, &num2); err == nil {
+					break
+				}
+			}
 		}
-		fmt.Println(inputString)
-
+		calculators.Run(num1, operation, num2)
+		fmt.Println(calculators.GetResult())
 	}
 
 }

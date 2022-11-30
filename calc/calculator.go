@@ -7,16 +7,18 @@ import (
 type Operations = map[string]func(float64, float64) float64
 
 type Calculator struct {
-	first     float64
 	operation Operations
-	second    float64
+	result    float64
+}
+
+func (c *Calculator) GetResult() float64 {
+	return c.result
 }
 
 func NewCalculator(operations Operations) *Calculator {
 	return &Calculator{
-		first:     0,
 		operation: operations,
-		second:    0,
+		result:    0,
 	}
 }
 
@@ -28,6 +30,14 @@ func NewDefaultCalculator() *Calculator {
 		"*": mul,
 	}
 	return NewCalculator(operations)
+}
+
+func (c *Calculator) Run(first float64, operation string, second float64) error {
+	if f, ok := c.operation[operation]; ok {
+		c.result = f(first, second)
+		return nil
+	}
+	return nil
 }
 
 func sum(a float64, b float64) float64 {
